@@ -31,6 +31,7 @@ import org.makerminds.internship.java.restaurantpoint.model.Drink;
 import org.makerminds.internship.java.restaurantpoint.model.Meal;
 import org.makerminds.internship.java.restaurantpoint.model.Menu;
 import org.makerminds.internship.java.restaurantpoint.model.Product;
+import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
 
 public class MenuItemManagerView {
 
@@ -38,8 +39,9 @@ public class MenuItemManagerView {
 	private JPanel contentPanel;
 	private MenuItemManagerController menuItemManagerController = new MenuItemManagerController();
 	private MenuManagerController menuManagerController = new MenuManagerController();
-	private String selectedRestaurant = null;
+	private String selectedRestaurantName = null;
 	private Menu selectedMenu = null;
+	private Restaurant selectedRestaurant = new Restaurant();
 	private JTextField menuItemNameField;
 	private JTextField menuItemIdField;
 	private JTextField menuItemPriceField;
@@ -51,6 +53,7 @@ public class MenuItemManagerView {
 	private JTable menuJTable = new JTable(defaultMenuItemTableModel);
 	private JRadioButton mealRadioButton;
 	private JRadioButton drinkRadioButton;
+	private JComboBox<String> restaurantComboBox;
 
 	/**
 	 * Launch the application.
@@ -147,7 +150,7 @@ public class MenuItemManagerView {
 		JPanel restaurantSelectionPanel = new JPanel();
 		TitledBorder restaurantSelectionTitledBorder = BorderFactory.createTitledBorder("Restaurant Selection");
 		restaurantSelectionPanel.setBorder(restaurantSelectionTitledBorder);
-		JComboBox<String> restaurantComboBox = new JComboBox<>();
+		restaurantComboBox = new JComboBox<>();
 		fillRestaurantComboBox(restaurantComboBox);
 		prepareItemListener(restaurantComboBox);
 		restaurantComboBox.setBounds(5, 40, 300, 60);
@@ -185,7 +188,7 @@ public class MenuItemManagerView {
 	}
 
 	private void fillRestaurantComboBox(JComboBox<String> restaurantComboBox) {
-		List<String> allRestaurants = menuManagerController.getRestaurantsAsString();
+		List<String> allRestaurants = menuItemManagerController.getRestaurantsAsString();
 		for (String restaurant : allRestaurants) {
 			restaurantComboBox.addItem(restaurant);
 		}
@@ -198,8 +201,9 @@ public class MenuItemManagerView {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				menuComboBox.removeAllItems();
-				selectedRestaurant = (String) restaurantComboBox.getSelectedItem();
-				String[] menuListAsArray = menuManagerController.getMenuListAsArray(selectedRestaurant);
+				selectedRestaurantName = (String) restaurantComboBox.getSelectedItem();
+				selectedRestaurant = menuManagerController.getRestaurantFromRestaurantName(selectedRestaurantName);
+				String[] menuListAsArray = menuItemManagerController.getMenuListAsArray(selectedRestaurant);
 				for (int i = 0; i < menuListAsArray.length; i++) {
 					menuComboBox.addItem(menuListAsArray[i]);
 				}

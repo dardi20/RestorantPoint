@@ -51,6 +51,7 @@ public class LogInView {
 	 */
 	public LogInView() {
 		initialize();
+		loginFrame.setVisible(true);
 	}
 
 	/**

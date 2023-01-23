@@ -8,19 +8,18 @@ import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
 import org.makerminds.internship.java.restaurantpoint.controller.MenuManagerController;
 import org.makerminds.internship.java.restaurantpoint.model.Menu;
+import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
 
 public class MenuManagerView {
 
@@ -28,10 +27,13 @@ public class MenuManagerView {
 	private JPanel contentPanel;
 	private MenuManagerController menuManagerController = new MenuManagerController();
 	private JList menuJList = new JList<>();
-	private String selectedRestaurant = null;
+	private Restaurant selectedRestaurant = new Restaurant();
 	private Menu selectedMenu = null;
 	private JTextField menuNameField;
 	private JTextField menuItemIdField;
+	private String selectedRestaurantName;
+	private JComboBox<String> restaurantComboBox= new JComboBox<>();
+	
 
 	/**
 	 * Launch the application.
@@ -53,8 +55,7 @@ public class MenuManagerView {
 	 * Create the application.
 	 */
 	public MenuManagerView() {
-//		super();
-		// initialize();
+		fillRestaurantComboBox(restaurantComboBox);
 	}
 
 	/**
@@ -111,7 +112,7 @@ public class MenuManagerView {
 		TitledBorder restaurantSelectionTitledBorder = BorderFactory.createTitledBorder("Restaurants");
 		restaurantSelectionPanel.setBorder(restaurantSelectionTitledBorder);
 //		String[] restaurantArray = menuManagerController.getRestaurantsIntoArray();
-		JComboBox<String> restaurantComboBox = new JComboBox<>();
+		JComboBox<String> restaurantComboBox= new JComboBox<>();
 		fillRestaurantComboBox(restaurantComboBox);
 		prepareItemListener(restaurantComboBox);
 		restaurantComboBox.setBounds(5, 40, 300, 60);
@@ -133,7 +134,8 @@ public class MenuManagerView {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				selectedRestaurant = (String) restaurantComboBox.getSelectedItem();
+				selectedRestaurantName = (String) restaurantComboBox.getSelectedItem();
+				selectedRestaurant = menuManagerController.getRestaurantFromRestaurantName(selectedRestaurantName);
 				String[] menuListAsArray = menuManagerController.getMenuListAsArray(selectedRestaurant);
 				menuJList.removeAll();
 				menuJList.setListData(menuListAsArray);

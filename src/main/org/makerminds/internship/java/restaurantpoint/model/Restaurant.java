@@ -6,12 +6,24 @@ public class Restaurant {
 	private String adress;
 	private String city;
 
-	public Restaurant(String name, String adress, String city) {
+	public Restaurant(String name, int id, String address) {
 		this.name = name;
-		this.adress = adress;
-		this.city = city;
+		this.adress = address;
+		this.id = id;
+	}
+	public Restaurant(String name,String address) {
+		this.name = name;
+		this.adress = address;
+	}
+	public Restaurant() {
 	}
 
+	public int getId() {
+		return id;
+	}
+	public void setId(int id) {
+		this.id = id;
+	}
 	public String getName() {
 		return name;
 	}

@@ -2,10 +2,12 @@ package org.makerminds.internship.java.restaurantpoint.controller;
 
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.makerminds.internship.java.restaurantpoint.model.Menu;
 import org.makerminds.internship.java.restaurantpoint.model.Product;
+import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
 import org.makerminds.internship.java.restorantpoint.data.DatabaseData;
 
 public class MenuItemManagerController {
@@ -17,7 +19,7 @@ public class MenuItemManagerController {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
+
 		return menu;
 	}
 
@@ -35,22 +37,53 @@ public class MenuItemManagerController {
 		return menuAsMatrix;
 	}
 
-	public void editMenuData(String string, Product selectedProduct, Menu selectedMenu,Product newProduct) {
+	public void editMenuData(String string, Product selectedProduct, Menu selectedMenu, Product newProduct) {
 		try {
 			switch (string) {
 			case "Delete":
 				new DatabaseData().deleteProduct(selectedProduct);
 				break;
 			case "Create":
-				new DatabaseData().createProduct(selectedProduct, selectedMenu.getMenuName(),newProduct);
+				new DatabaseData().createProduct(selectedProduct, selectedMenu.getMenuName(), newProduct);
 				break;
 			case "Update":
-				new DatabaseData().updateProduct(selectedProduct, selectedMenu,newProduct);
+				new DatabaseData().updateProduct(selectedProduct, selectedMenu, newProduct);
 				break;
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
+
+	public Restaurant getRestaurants(String selectedRestaurantId) {
+		Restaurant restaurant = null;
+		try {
+			restaurant = new DatabaseData().getRestaurantFromRestaurantId(selectedRestaurantId);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return restaurant;
+	}
+
+	public List<String> getRestaurantsAsString() {
+		List<String> restaurantsList = null;
+		try {
+			restaurantsList = new DatabaseData().getRestaurantsAsList();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return restaurantsList;
+	}
+
+	public String[] getMenuListAsArray(Restaurant selectedRestaurant) {
+			String[] menuListAsArray = null;
+			try {
+				menuListAsArray = new DatabaseData().getMenusFromRestaurants(selectedRestaurant);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+			return menuListAsArray;
+		}
 
 }

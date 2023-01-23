@@ -3,6 +3,8 @@ package org.makerminds.internship.java.restaurantpoint.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,6 +17,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableModel;
 
 import org.makerminds.internship.java.restaurantpoint.controller.RestaurantManagerController;
+import org.makerminds.internship.java.restaurantpoint.model.Drink;
+import org.makerminds.internship.java.restaurantpoint.model.Meal;
 import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
 
 public class RestaurantManagerView {
@@ -23,7 +27,10 @@ public class RestaurantManagerView {
 	private JTextField restaurantNameField;
 	private JTextField restaurantAddressField;
 	private RestaurantManagerController restaurantManagerController = new RestaurantManagerController();
-	private Restaurant selectedRestaurant;
+	private Restaurant selectedRestaurant = new Restaurant();
+	private DefaultTableModel defaultTableModel;
+	private String[] columnNames = { "Restaurant Name", "Restaurant Address" };
+	private String[][] restaurantTableData; 
 
 	/**
 	 * Launch the application.
@@ -123,18 +130,17 @@ public class RestaurantManagerView {
 	}
 
 	private JScrollPane createRestaurantTableScrollPane() {
-		String[][] restaurantTableData = restaurantManagerController.getRestaurantTableDataAsMatrix();
+		restaurantTableData = restaurantManagerController.getRestaurantTableDataAsMatrix();
 
-		DefaultTableModel defaultTableModel = new DefaultTableModel(restaurantTableData,
-				new String[] { "Restaurant Name", "Restaurant Address" });
+		defaultTableModel = new DefaultTableModel(restaurantTableData, columnNames);
 		JTable restaurantTableDetails = new JTable(defaultTableModel);
+		prepareTableItemListener(restaurantTableDetails);
 		JScrollPane restaurantTableDetailsScrollPane = new JScrollPane(restaurantTableDetails);
 		restaurantTableDetailsScrollPane.setBounds(8, 20, 334, 220);
 		return restaurantTableDetailsScrollPane;
 	}
 
-	
-	//TODO refresh the table after cruds operations
+	// TODO refresh the table after cruds operations
 	private void prepareDeleteRestaurantButtonActionListener(JButton deleteRestaurantButton) {
 		deleteRestaurantButton.addActionListener(new ActionListener() {
 
@@ -142,6 +148,10 @@ public class RestaurantManagerView {
 			public void actionPerformed(ActionEvent e) {
 				String restaurantName = selectedRestaurant.getName();
 				restaurantManagerController.editRestaurantData("Delete", restaurantName, null);
+				restaurantTableData = restaurantManagerController.getRestaurantTableDataAsMatrix();
+				defaultTableModel.setDataVector(restaurantTableData, columnNames);
+				defaultTableModel.fireTableDataChanged();
+
 			}
 		});
 
@@ -154,8 +164,11 @@ public class RestaurantManagerView {
 			public void actionPerformed(ActionEvent e) {
 				String restaurantName = selectedRestaurant.getName();
 				Restaurant newRestaurant = new Restaurant(restaurantNameField.getText(),
-						restaurantAddressField.getText(), "");
+						restaurantAddressField.getText());
 				restaurantManagerController.editRestaurantData("Update", restaurantName, newRestaurant);
+				restaurantTableData = restaurantManagerController.getRestaurantTableDataAsMatrix();
+				defaultTableModel.setDataVector(restaurantTableData, columnNames);
+				defaultTableModel.fireTableDataChanged();
 			}
 		});
 	}
@@ -166,8 +179,24 @@ public class RestaurantManagerView {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				Restaurant newRestaurant = new Restaurant(restaurantNameField.getText(),
-						restaurantAddressField.getText(), "");
+						restaurantAddressField.getText());
 				restaurantManagerController.editRestaurantData("Create", null, newRestaurant);
+				restaurantTableData = restaurantManagerController.getRestaurantTableDataAsMatrix();
+				defaultTableModel.setDataVector(restaurantTableData, columnNames);
+				defaultTableModel.fireTableDataChanged();
+			}
+		});
+	}
+	private void prepareTableItemListener(JTable restaurantJTable) {
+		restaurantJTable.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				int selectedRestaurantItemRow = restaurantJTable.getSelectedRow();
+				if (selectedRestaurantItemRow != -1) {
+					restaurantNameField.setText(restaurantTableData[selectedRestaurantItemRow][0]);
+					selectedRestaurant.setName(restaurantTableData[selectedRestaurantItemRow][0]);
+					restaurantAddressField.setText(restaurantTableData[selectedRestaurantItemRow][1]);
+					selectedRestaurant.setAdress(restaurantTableData[selectedRestaurantItemRow][1]);
+				}
 			}
 		});
 	}

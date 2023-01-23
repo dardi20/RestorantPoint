@@ -124,11 +124,11 @@ public class MainView {
 			}
 			navigationBarPanelButton.add(navigationBarItemLabel);
 			JLabel contentLabel = new JLabel("" + i);
-			JPanel buttonContentPanel = null;
-			buttonContentPanel = assignViewBasedOnContent(contentLabel);
+//			JPanel buttonContentPanel = null;
+//			buttonContentPanel = assignViewBasedOnContent(contentLabel);
 
 			navigationBarPanelButtons.add(navigationBarPanelButton);
-			prepareNavigationBarItemMouseListener(buttonContentPanel, navigationBarPanelButton);
+			prepareNavigationBarItemMouseListener(contentLabel, navigationBarPanelButton);
 		}
 		return navigationBarPanelButtons;
 	}
@@ -136,28 +136,41 @@ public class MainView {
 	private JPanel assignViewBasedOnContent(JLabel contentLabel) {
 		switch (contentLabel.getText()) {
 		case "1":
-			return new RestaurantManagerView().createRestaurantManagerPanel();
+			JPanel restaurantManagerPanel = new RestaurantManagerView().createRestaurantManagerPanel();
+			return restaurantManagerPanel;
 		case "2":
-			return new MenuManagerView().createMenuManagerPanel();
+			JPanel menuManagerPanel = new MenuManagerView().createMenuManagerPanel();
+			return menuManagerPanel;
 		case "3":
-			return new MenuItemManagerView().createMenuItemManagerPanel();
+			JPanel menuItemManagerPanel = new MenuItemManagerView().createMenuItemManagerPanel();
+			return menuItemManagerPanel;
 		case "4":
-			return new MenuManagerView().createManagementPanel();
+			JPanel tableManagerPanel = new TableManagerView().createTableManagerPanel();
+			return tableManagerPanel;
+		case "5":
+			return null;
 		default:
 			return null;
 		}
 	}
 
-	private void prepareNavigationBarItemMouseListener(JPanel buttonContentPanel, JPanel navigationBarPanelButton) {
+	private void prepareNavigationBarItemMouseListener(JLabel contentLabel, JPanel navigationBarPanelButton) {
 		navigationBarPanelButton.addMouseListener(new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
-				//TODO create a if statement to implement signout
+				// TODO create a if statement to implement signout
+				JPanel buttonContentPanel = assignViewBasedOnContent(contentLabel);
+				if(buttonContentPanel!=null) {
 				buttonContentPanel.setBounds(5, 20, 690, 550);
 				contentPanel.setLayout(null);
 				contentPanel.removeAll();
 				contentPanel.add(buttonContentPanel);
 				contentPanel.repaint();
 				contentPanel.revalidate();
+				}
+				else {
+					frame.setVisible(false);
+					new LogInView();
+				}
 			}
 		});
 	}
