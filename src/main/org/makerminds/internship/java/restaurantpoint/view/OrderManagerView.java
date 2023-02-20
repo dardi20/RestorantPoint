@@ -17,10 +17,14 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 import org.makerminds.internship.java.restaurantpoint.controller.MenuManagerController;
+import org.makerminds.internship.java.restaurantpoint.controller.OrderManagerController;
 import org.makerminds.internship.java.restaurantpoint.model.Menu;
 import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
+import org.makerminds.internship.java.restaurantpoint.model.Table;
 
 public class OrderManagerView {
 	private JFrame frame;
@@ -33,11 +37,13 @@ public class OrderManagerView {
 	private JTextField menuItemIdField;
 	private String selectedRestaurantName;
 	private JComboBox<String> restaurantComboBox= new JComboBox<>();
+	private OrderManagerController orderManagerController= new OrderManagerController();
+	private String selectedTable;
 	
-
 	/**
 	 * Launch the application.
 	 */
+	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
@@ -63,7 +69,7 @@ public class OrderManagerView {
 	private void initialize() {
 //		contentPanel = new JPanel();
 //		contentPanel.setBounds(280, 5, 699, 568);
-		createManagementPanel();
+		createOrderManagerPanel();
 //		super.getFrame().add(contentPanel);
 
 	}
@@ -122,13 +128,27 @@ public class OrderManagerView {
 	}
 
 	private void prepareItemListener(JList tablesList) {
-		// TODO Auto-generated method stub
+		tablesList.addListSelectionListener(new ListSelectionListener() {
+
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				selectedTable = (String) e.getSource();
+				
+			}
+			
+		});
 		
 	}
 
 	private void fillListModel(DefaultListModel<String> listModel) {
-	// TODO Auto-generated method stub
-	
+	// TODO Get Restaurant for that specific waiter.
+		Restaurant logedInUserRestaurant = new Restaurant();
+		List<Table>tablesAsList = orderManagerController.getTablesForRestaurant(logedInUserRestaurant);
+		int i=0;
+		for(Table table: tablesAsList) {
+			listModel.add(i, table.getTable_id()+"");
+			i++;
+		}
 }
 
 	private void fillRestaurantComboBox(JComboBox<String> restaurantComboBox) {
