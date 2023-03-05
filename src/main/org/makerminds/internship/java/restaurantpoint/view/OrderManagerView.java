@@ -3,6 +3,8 @@ package org.makerminds.internship.java.restaurantpoint.view;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.List;
 
 import javax.swing.BorderFactory;
@@ -20,31 +22,37 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 
+import org.makerminds.internship.java.restaurantpoint.controller.LoginController;
+import org.makerminds.internship.java.restaurantpoint.controller.MenuItemManagerController;
 import org.makerminds.internship.java.restaurantpoint.controller.MenuManagerController;
 import org.makerminds.internship.java.restaurantpoint.controller.OrderManagerController;
 import org.makerminds.internship.java.restaurantpoint.model.Menu;
 import org.makerminds.internship.java.restaurantpoint.model.Product;
 import org.makerminds.internship.java.restaurantpoint.model.Restaurant;
 import org.makerminds.internship.java.restaurantpoint.model.Table;
+import org.makerminds.internship.java.restaurantpoint.model.User;
 
 public class OrderManagerView {
 	private JFrame frame;
 	private JPanel contentPanel;
 	private MenuManagerController menuManagerController = new MenuManagerController();
 	private JList menuJList = new JList<>();
-	private Restaurant selectedRestaurant = new Restaurant();
+	private String selectedRestaurantId;
 	private Product selectedProduct = new Product();
 	private String selectedMenu;
 	private JTextField menuNameField;
 	private JTextField menuItemIdField;
 	private String selectedRestaurantName;
-	private String[] columnNames = {"Product", "Price"};
+	private String[] columnNames = { "Product", "Price" };
 	private String[][] menuItemData;
 	private DefaultTableModel menuItemsTableModel = new DefaultTableModel(menuItemData, columnNames);
 	private JTable menuItemsTable = new JTable(menuItemsTableModel);
 	private JComboBox<String> restaurantComboBox = new JComboBox<>();
 	private OrderManagerController orderManagerController = new OrderManagerController();
+	private MenuItemManagerController menuItemManagerController = new MenuItemManagerController();
 	private String selectedTable;
+	private JPanel orderManagerPanel;
+	private JPanel orderOverviewPanel;
 
 	/**
 	 * Launch the application.
@@ -67,6 +75,10 @@ public class OrderManagerView {
 	 * Create the application.
 	 */
 	public OrderManagerView() {
+		User loggedInUser = LoginController.getInstance().getLoggedInUser();
+		this.selectedRestaurantId = loggedInUser.getRestaurant();
+		this.orderManagerPanel = createOrderManagerPanel();
+		this.orderOverviewPanel = createOrderOverviewPanel();
 	}
 
 	/**
@@ -75,7 +87,7 @@ public class OrderManagerView {
 	private void initialize() {
 //		contentPanel = new JPanel();
 //		contentPanel.setBounds(280, 5, 699, 568);
-		createOrderManagerPanel();
+		this.orderManagerPanel = createOrderManagerPanel();
 //		super.getFrame().add(contentPanel);
 
 	}
@@ -87,9 +99,8 @@ public class OrderManagerView {
 		JPanel tableSelectionPanel = createTableSelectionPanel();
 		tableSelectionPanel.setBounds(30, 30, 310, 110);
 		orderManagerPanel.add(tableSelectionPanel);
-		
-	
-		//		JPanel menuListPanel = createMenuListPanel();
+
+		// JPanel menuListPanel = createMenuListPanel();
 //		menuListPanel.setBounds(310, 150, 350, 250);
 //		orderManagerPanel.add(menuListPanel);
 //		JPanel managmentPanel = createManagementPanel();
@@ -136,37 +147,45 @@ public class OrderManagerView {
 	}
 
 	private void prepareItemListener(JList tablesList) {
-	/*	TODO implement method to set false current order manager panel and create a new order overview panel with the following
-	*	elements: a menu combo box (filter menulistr from the selected restaurant)
-	*			  a menu Items JTable (Product name, price)
-	*			  a order overview table (Product name , quantity, price)
-	*			  JText field subtotal,vat,total
-	*			  Order JButton That will confirm the Order. 
-	*	
-	**/
-		tablesList.addListSelectionListener(new ListSelectionListener() {
-
-			@Override
-			public void valueChanged(ListSelectionEvent e) {
-				selectedTable = (String) e.getSource();
-
+		/*
+		 * TODO implement method to set false current order manager panel and create a
+		 * new order overview panel with the following elements: a menu combo box
+		 * (filter menulistr from the selected restaurant) a menu Items JTable (Product
+		 * name, price) a order overview table (Product name , quantity, price) JText
+		 * field subtotal,vat,total Order JButton That will confirm the Order.
+		 * 
+		 **/
+		tablesList.addMouseListener(new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				// filters unmapped clicks
+				if (e.getClickCount() == 2 && e.getSource() != null) {
+					selectedTable=(String)e.getSource();
+					orderManagerPanel.setVisible(false);
+					orderOverviewPanel.setVisible(true);
+				}
 			}
-
 		});
+
+//		addListSelectionListener(new ListSelectionListener() {
+//
+//			@Override
+//			public void valueChanged(ListSelectionEvent e) {
+//				selectedTable = (String) e.getSource();
+//
+//			}
+//
+//		});
 
 	}
 
 	private void fillListModel(DefaultListModel<String> listModel) {
-		// TODO Get Restaurant for that specific waiter.
-		Restaurant logedInUserRestaurant = new Restaurant();
-		List<Table> tablesAsList = orderManagerController.getTablesForRestaurant(logedInUserRestaurant);
+		List<Table> tablesAsList = orderManagerController.getTablesForRestaurant(selectedRestaurantId);
 		int i = 0;
 		for (Table table : tablesAsList) {
 			listModel.add(i, table.getTable_id() + "");
 			i++;
 		}
 	}
-
 
 //	private void prepareItemListener(JComboBox<String> restaurantComboBox) {
 //		restaurantComboBox.addActionListener(new ActionListener() {
@@ -183,85 +202,91 @@ public class OrderManagerView {
 //	}
 
 	public JPanel createOrderOverviewPanel() {
-	
+
 		JPanel orderOverviewPanel = new JPanel();
 		TitledBorder orderOverviewBorder = BorderFactory.createTitledBorder("Table Order Details");
 		orderOverviewPanel.setBorder(orderOverviewBorder);
-		
+
 		orderOverviewPanel.setBounds(30, 30, 310, 110);
-		
+
 		orderOverviewPanel.setLayout(null);
-		
-		
+
 		JComboBox<String> menuSelectionComboBox = new JComboBox<>();
 		fillMenuSelectionComboBox(menuSelectionComboBox);
-		menuSelectionComboBox.setBounds(10,20,150,40);
+		menuSelectionComboBox.setBounds(10, 20, 150, 40);
 		orderOverviewPanel.add(menuSelectionComboBox);
-		
-	    
-		fillMenuItemTableModel(menuItemsTableModel);
-		//TODO verify correct borders
+		prepareMenuSelectionActionListener(menuSelectionComboBox);
+
+	    // menu item table get filled after clicking a menu from Combo BOX
+		//		fillMenuItemTableModel(menuItemsTableModel);
+		// TODO verify correct bounds
 		menuItemsTable.setBounds(0, 0, 0, 0);
 		orderOverviewPanel.add(menuItemsTable);
-	    
-	    
+
 		menuNameField = new JTextField();
 		menuNameField.setBounds(10, 60, 150, 40);
 		orderOverviewPanel.add(menuNameField);
-		
+
 		JButton addProductButton = new JButton("Create");
 		addProductButton.setBounds(5, 390, 70, 40);
 		prepareAddProductButtonActionListener(addProductButton);
 		orderOverviewPanel.add(addProductButton);
-		
+
 		JButton deleteProductButton = new JButton("Delete");
 		deleteProductButton.setBounds(80, 390, 70, 40);
 		prepareDeleteProductButtonActionListener(deleteProductButton);
 		orderOverviewPanel.add(deleteProductButton);
-		
+
 		JButton printInvoiceButton = new JButton();
 		printInvoiceButton.setBounds(155, 390, 70, 40);
 		orderOverviewPanel.add(printInvoiceButton);
-		
-		
+
 		orderOverviewPanel.setVisible(false);
-		
+
 		return orderOverviewPanel;
 	}
-
-	private void fillMenuItemTableModel(DefaultTableModel menuItemsTableModel) {
+	private void prepareMenuSelectionActionListener(JComboBox<String> menuSelectionComboBox) {
+		menuSelectionComboBox.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				selectedMenu = (String)e.getSource();
+				fillMenuItemTableModel(menuItemsTableModel);
+			}
+		});
 		
-		menuItemData = orderManagerController.getMenuItems(selectedMenu);
-		menuItemsTableModel.setDataVector(menuItemData, columnNames);
-		menuItemsTableModel.fireTableDataChanged();
-}
+	}
 
 	private void fillMenuSelectionComboBox(JComboBox<String> menuSelecttionComboBox) {
-		List<String> menusAsString = orderManagerController.getMenusAsString(selectedRestaurant);
+		String[] menusAsString = menuManagerController.getMenuListAsArray(new Restaurant(Integer.valueOf(selectedRestaurantId)));
 		for (String menu : menusAsString) {
 			menuSelecttionComboBox.addItem(menu);
 		}
 		
 	}
-	
-	
-	
-	
+
+	private void fillMenuItemTableModel(DefaultTableModel menuItemsTableModel) {
+		Menu selectedMenuObject = menuItemManagerController.getMenuFromSelectedMenuName(selectedMenu);
+		menuItemData = menuItemManagerController.getMenuDataAsMatrix(selectedMenuObject);
+		menuItemsTableModel.setDataVector(menuItemData, columnNames);
+		menuItemsTableModel.fireTableDataChanged();
+	}
+
+
 	private void prepareDeleteProductButtonActionListener(JButton deleteProductButton) {
 		deleteProductButton.addActionListener(new ActionListener() {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if (selectedProduct != null) {
-					orderManagerController.editOrderOverview("Delete", selectedProduct, selectedRestaurant);
-					String[] orderOverviewAsArray = orderManagerController.getOrderOverviewAsArray(selectedRestaurant);
+					orderManagerController.editOrderOverview("Delete", selectedProduct, selectedRestaurantId);
+					String[] orderOverviewAsArray = orderManagerController.getOrderOverviewAsArray(selectedRestaurantId);
 					menuJList.removeAll();
 					menuJList.setListData(orderOverviewAsArray);
 				}
 			}
 		});
 	}
-
 
 	private void prepareAddProductButtonActionListener(JButton addProductButton) {
 		addProductButton.addActionListener(new ActionListener() {
@@ -271,8 +296,8 @@ public class OrderManagerView {
 
 			public void actionPerformed(ActionEvent e) {
 				if (selectedProduct != null) {
-					orderManagerController.editOrderOverview("Create", selectedProduct, selectedRestaurant);
-					String[] orderOverviewAsArray = orderManagerController.getOrderOverviewAsArray(selectedRestaurant);
+					orderManagerController.editOrderOverview("Create", selectedProduct, selectedRestaurantId);
+					String[] orderOverviewAsArray = orderManagerController.getOrderOverviewAsArray(selectedRestaurantId);
 					menuJList.removeAll();
 					menuJList.setListData(orderOverviewAsArray);
 				}
@@ -286,7 +311,9 @@ public class OrderManagerView {
 			}
 		});
 	}
-
+//TODO add acion listener for order button which should set the table order status to occupied if free,
+	// add action listener for print invoice to open a dialog box showing the total order and set table to free when occupied.
+	
 	public JPanel getContentPanel() {
 		return contentPanel;
 	}

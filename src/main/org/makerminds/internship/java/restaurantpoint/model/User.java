@@ -6,10 +6,24 @@ public class User {
 	public String toString() {
 		return "User [username=" + username + ", password=" + password + ", userRole=" + userRole + "]";
 	}
-	private String username;
+	 private String username;
 	 private String password;
 	 private UserRole userRole;
+	 //this variable is used only for users that are waiters.
+	 private String restaurant;
 	 
+	public UserRole getUserRole() {
+		return userRole;
+	}
+	public void setUserRole(UserRole userRole) {
+		this.userRole = userRole;
+	}
+	public String getRestaurant() {
+		return restaurant;
+	}
+	public void setRestaurant(String restaurant) {
+		this.restaurant = restaurant;
+	}
 	public String getUsername() {
 		return username;
 	}

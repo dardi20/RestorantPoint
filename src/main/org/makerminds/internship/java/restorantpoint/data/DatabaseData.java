@@ -47,6 +47,8 @@ public class DatabaseData {
 						case "user_role":
 							user.setUserStatus(UserData.generateUserStatus(rs.getString(i)));
 							break;
+						case "restaurant":
+							user.setRestaurant(rs.getString(i));
 						}
 					}
 					usersList.add(user);

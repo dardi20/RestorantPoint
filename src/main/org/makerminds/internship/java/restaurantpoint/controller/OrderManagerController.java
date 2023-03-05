@@ -8,17 +8,17 @@ import org.makerminds.internship.java.restaurantpoint.model.Table;
 
 public class OrderManagerController {
 
-	public List<Table> getTablesForRestaurant(Restaurant logedInUserRestaurant) {
+	public List<Table> getTablesForRestaurant(String logedInUserRestaurant) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
-	public void editOrderOverview(String string, Product selectedProduct, Restaurant selectedRestaurant) {
+	public void editOrderOverview(String string, Product selectedProduct, String selectedRestaurant) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public String[] getOrderOverviewAsArray(Restaurant selectedRestaurant) {
+	public String[] getOrderOverviewAsArray(String selectedRestaurant) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -28,10 +28,6 @@ public class OrderManagerController {
 		return null;
 	}
 
-	public List<String> getMenusAsString(Restaurant selectedRestaurant) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 
 }
